@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archivio Documenti PDF</title>
+    <title>Canti Parrocchia San Martino - Levane</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,9 +12,20 @@
             padding: 20px;
             background-color: #f9f9f9;
         }
-        h1 {
-            color: #333;
+        .header-container {
             text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .sottotitolo {
+            color: #7f8c8d;
+            margin-top: 0;
+            font-size: 16px;
+            font-style: italic;
         }
         #searchBar {
             width: 100%;
@@ -58,10 +69,13 @@
 </head>
 <body>
 
-    <h1>I Miei Documenti PDF</h1>
+    <div class="header-container">
+        <h1>Canti Parrocchia San Martino</h1>
+        <p class="sottotitolo">Levane</p>
+    </div>
     
     <!-- Barra di ricerca -->
-    <input type="text" id="searchBar" placeholder="Cerca un documento per titolo..." onkeyup="filtraDocumenti()">
+    <input type="text" id="searchBar" placeholder="Cerca un canto per titolo..." onkeyup="filtraDocumenti()">
 
     <!-- Lista dei PDF -->
     <ul id="listaDocumenti"></ul>
@@ -73,11 +87,17 @@
         async function caricaDocumenti() {
             try {
                 const response = await fetch('documenti.json');
+                
+                if (!response.ok) {
+                    throw new Error(`Impossibile trovare il file documenti.json (Stato: ${response.status})`);
+                }
+                
                 tuttiIDocumenti = await response.json();
                 mostraDocumenti(tuttiIDocumenti);
             } catch (error) {
-                console.error("Errore nel caricamento del file JSON:", error);
-                document.getElementById('listaDocumenti').innerHTML = "<li>Errore nel caricamento dei documenti.</li>";
+                console.error("Dettaglio Errore:", error);
+                document.getElementById('listaDocumenti').innerHTML = 
+                    `<li>Errore nel caricamento dei canti.<br><small style="color:red;">Dettaglio: ${error.message}</small></li>`;
             }
         }
 
@@ -87,7 +107,7 @@
             lista.innerHTML = '';
 
             if (documenti.length === 0) {
-                lista.innerHTML = '<li class="nessun-risultato">Nessun documento trovato.</li>';
+                lista.innerHTML = '<li class="nessun-risultato">Nessun canto trovato.</li>';
                 return;
             }
 
