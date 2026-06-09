@@ -176,19 +176,20 @@
             const modal = document.getElementById('pdfModal');
             const frame = document.getElementById('pdfFrame');
             
-            // Dati reali del tuo account GitHub
+            // Dati del tuo account GitHub
             const username = 'cantiparrocchiasanmartino';
             const repository = 'Canti';
             
-            // Costruiamo il link del file PDF su GitHub Pages
-            const linkAssoluto = `https://${username}.github.io/${repository}/${fileUrl}`;
+            // Uniamo i testi usando il simbolo + per evitare errori di virgolette storte
+            const linkAssoluto = 'https://' + username + '.github.io/' + repository + '/' + fileUrl;
             
-            // Configurazione corretta per il visualizzatore di Google
-            frame.src = `https://google.com{encodeURIComponent(linkAssoluto)}`; 
+            // Creiamo il link di Google Docs senza usare i backtick
+            frame.src = 'https://google.com' + encodeURIComponent(linkAssoluto); 
             
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden'; 
         }
+
 
 
 
