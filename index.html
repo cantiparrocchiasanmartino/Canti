@@ -67,7 +67,7 @@
             font-style: italic;
         }
         
-        /* Stili per il visualizzatore a schermo intero (Modal) */
+        /* Stili per la finestra a schermo intero (Modal) */
         #pdfModal {
             display: none;
             position: fixed;
@@ -75,8 +75,29 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.85);
             z-index: 1000;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            color: white;
+        }
+        #closeBtn {
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #e74c3c;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        #fallbackLink {
+            color: #3498db;
+            text-decoration: underline;
+            font-weight: bold;
+            font-size: 15px;
         }
         #modalContent {
             position: absolute;
@@ -88,20 +109,15 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        #pdfFrame {
+        #pdfObject {
             width: 100%;
             height: 100%;
             border: none;
         }
-        #closeBtn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: white;
-            font-size: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        .error-inside-modal {
+            padding: 30px;
+            text-align: center;
+            color: #333;
         }
     </style>
 </head>
@@ -118,9 +134,19 @@
 
     <!-- Finestra di visualizzazione PDF incorporata -->
     <div id="pdfModal">
-        <span id="closeBtn" onclick="chiudiPDF()">&times; Chiudi</span>
+        <div class="modal-header">
+            <!-- Pulsante alternativo se il browser mobile non renderizza il PDF internamente -->
+            <a id="fallbackLink" href="#" target="_blank">Apri a schermo intero</a>
+            <span id="closeBtn" onclick="chiudiPDF()">✖ Chiudi</span>
+        </div>
         <div id="modalContent">
-            <iframe id="pdfFrame" src=""></iframe>
+            <!-- Usiamo object al place di iframe per una migliore compatibilità con i PDF -->
+            <object id="pdfObject" data="" type="application/pdf">
+                <div class="error-inside-modal">
+                    <p>Il tuo dispositivo non supporta l'anteprima dei PDF direttamente nella pagina.</p>
+                    <p><a id="fallbackLinkMobile" href="#" target="_blank" style="color: #0066cc; font-weight: bold; font-size: 18px;">Clicca qui per visualizzare il canto</a></p>
+                </div>
+            </object>
         </div>
     </div>
 
@@ -150,7 +176,6 @@
             documenti.forEach(doc => {
                 const li = document.createElement('li');
                 li.className = 'documento-item';
-                // Al clic sulla riga, si apre il visualizzatore interno
                 li.onclick = () => apriPDF(doc.file);
                 
                 const a = document.createElement('span');
@@ -170,35 +195,27 @@
             mostraDocumenti(documentiFiltrati);
         }
 
-        // Funzioni per gestire il visualizzatore
-        // Funzione aggiornata per forzare la visualizzazione su Android e iPhone
         function apriPDF(fileUrl) {
             const modal = document.getElementById('pdfModal');
-            const frame = document.getElementById('pdfFrame');
+            const pdfObject = document.getElementById('pdfObject');
+            const fallbackLink = document.getElementById('fallbackLink');
+            const fallbackLinkMobile = document.getElementById('fallbackLinkMobile');
             
-            // Dati del tuo account GitHub
-            const username = 'cantiparrocchiasanmartino';
-            const repository = 'Canti';
-            
-            // Uniamo i testi usando il simbolo + per evitare errori di virgolette storte
-            const linkAssoluto = 'https://' + username + '.github.io/' + repository + '/' + fileUrl;
-            
-            // Creiamo il link di Google Docs senza usare i backtick
-            frame.src = 'https://google.com' + encodeURIComponent(linkAssoluto); 
+            // Imposta l'indirizzo del PDF direttamente dal percorso relativo (senza passare da Google)
+            pdfObject.data = fileUrl;
+            fallbackLink.href = fileUrl;
+            if(fallbackLinkMobile) fallbackLinkMobile.href = fileUrl;
             
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden'; 
         }
 
-
-
-
         function chiudiPDF() {
             const modal = document.getElementById('pdfModal');
-            const frame = document.getElementById('pdfFrame');
-            frame.src = '';
+            const pdfObject = document.getElementById('pdfObject');
+            pdfObject.data = '';
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Riattiva lo scroll
+            document.body.style.overflow = 'auto'; 
         }
 
         caricaDocumenti();
