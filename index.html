@@ -8,18 +8,31 @@
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
-            margin: 10px auto;
-            padding: 10px 15px;
+            margin: 0 auto;
+            padding: 0;
             background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Blocca l'altezza totale allo schermo disponibile */
+            overflow: hidden; /* Impedisce alla pagina intera di scrollare */
         }
+        
+        /* Contenitore superiore FISSO */
+        .top-fixed-container {
+            background-color: #f9f9f9;
+            padding: 10px 15px 5px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03); /* Una leggera ombra sotto la barra */
+            z-index: 10;
+        }
+        
         .header-container {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         h1 {
             color: #2c3e50;
             margin-top: 5px;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             font-size: 26px;
         }
         .sottotitolo {
@@ -32,12 +45,21 @@
         #searchBar {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
         }
+        
+        /* Area dei canti che SCROLLA da sola */
+        .scroll-content {
+            flex: 1;
+            overflow-y: auto; /* Attiva lo scroll solo qui dentro */
+            padding: 10px 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         #listaDocumenti {
             list-style: none;
             padding: 0;
@@ -67,7 +89,7 @@
             font-style: italic;
         }
         
-        /* Finestra a schermo intero (Modal) totalmente bianca */
+        /* Finestra a schermo intero (Modal) */
         #pdfModal {
             display: none;
             position: fixed;
@@ -75,14 +97,14 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #ffffff !important; /* Forza lo sfondo bianco ovunque */
+            background-color: #ffffff !important;
             z-index: 1000;
         }
         .modal-header {
             display: flex;
             justify-content: flex-end;
             padding: 10px 15px;
-            background-color: #ffffff; /* Intestazione bianca per fondersi con lo spartito */
+            background-color: #ffffff;
             border-bottom: 1px solid #eee;
             height: 40px;
             box-sizing: border-box;
@@ -105,11 +127,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: #ffffff; /* Sfondo del contenuto bianco */
+            background: #ffffff;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        /* L'immagine si adatta dinamicamente per eliminare le bande */
         .canto-immagine {
             width: 100%;
             max-width: 100%;
@@ -122,14 +143,19 @@
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>Canti Parrocchia San Martino</h1>
-        <p class="sottotitolo">Levane</p>
+    <!-- Blocco fisso in alto -->
+    <div class="top-fixed-container">
+        <div class="header-container">
+            <h1>Canti Parrocchia San Martino</h1>
+            <p class="sottotitolo">Levane</p>
+        </div>
+        <input type="text" id="searchBar" placeholder="Cerca un canto per titolo..." onkeyup="filtraDocumenti()">
     </div>
     
-    <input type="text" id="searchBar" placeholder="Cerca un canto per titolo..." onkeyup="filtraDocumenti()">
-
-    <ul id="listaDocumenti"></ul>
+    <!-- Blocco che scorre -->
+    <div class="scroll-content">
+        <ul id="listaDocumenti"></ul>
+    </div>
 
     <!-- Finestra di visualizzazione interna -->
     <div id="pdfModal">
@@ -192,7 +218,6 @@
             
             img.src = fileUrl;
             modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
         }
 
         function chiudiPDF() {
@@ -201,7 +226,6 @@
             
             img.src = '';
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
         caricaDocumenti();
