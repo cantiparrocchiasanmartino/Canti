@@ -176,20 +176,20 @@
             const modal = document.getElementById('pdfModal');
             const frame = document.getElementById('pdfFrame');
             
-            // Sostituisci obbligatoriamente 'IL_TUO_USERNAME_GITHUB' con il tuo vero nome utente di GitHub
-            // e 'IL_NOME_DEL_REPOSITORIO' con il nome che hai dato al progetto su GitHub
+            // Dati reali del tuo account GitHub
             const username = 'cantiparrocchiasanmartino';
             const repository = 'Canti';
             
-            // Costruiamo l'indirizzo internet completo del file PDF
+            // Costruiamo il link del file PDF su GitHub Pages
             const linkAssoluto = `https://${username}.github.io/${repository}/${fileUrl}`;
             
-            // Usiamo il visualizzatore di Google dentro l'iframe per evitare il download forzato
+            // Configurazione corretta per il visualizzatore di Google
             frame.src = `https://google.com{encodeURIComponent(linkAssoluto)}`; 
             
             modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Blocca lo scroll della pagina sotto
+            document.body.style.overflow = 'hidden'; 
         }
+
 
 
         function chiudiPDF() {
