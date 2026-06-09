@@ -156,7 +156,7 @@
             documenti.forEach(doc => {
                 const li = document.createElement('li');
                 li.className = 'documento-item';
-                li.onclick = () => gestisciAperturaPDF(doc.file);
+                li.onclick = function() { gestisciAperturaPDF(doc.file); };
                 
                 const a = document.createElement('span');
                 a.className = 'documento-link';
@@ -175,16 +175,15 @@
             mostraDocumenti(documentiFiltrati);
         }
 
-        // Rileva automaticamente il tipo di dispositivo
+        // Rileva automaticamente il tipo di dispositivo ed evita errori CORS
         function gestisciAperturaPDF(fileUrl) {
-            // Controlla se l'utente è su uno smartphone/tablet Android o iOS
-            constisMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             
             if (isMobile) {
-                // SUL TELEFONO: Apre il file in una nuova scheda sfruttando la fluidità del browser mobile
+                // SUL TELEFONO: Apre direttamente il link in una nuova scheda
                 window.open(fileUrl, '_blank');
             } else {
-                // SUL COMPUTER: Mostra il bellissimo box interno con il tasto chiudi
+                // SUL COMPUTER: Mostra il riquadro interno a comparsa
                 const modal = document.getElementById('pdfModal');
                 const frame = document.getElementById('pdfFrame');
                 frame.src = fileUrl;
