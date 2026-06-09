@@ -67,7 +67,7 @@
             font-style: italic;
         }
         
-        /* Stili per la finestra a schermo intero (Modal) */
+        /* Stili per il visualizzatore interno (attivo solo su PC) */
         #pdfModal {
             display: none;
             position: fixed;
@@ -98,7 +98,7 @@
             left: 10px;
             right: 10px;
             bottom: 10px;
-            background: #525659;
+            background: white;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -120,13 +120,12 @@
 
     <ul id="listaDocumenti"></ul>
 
-    <!-- Finestra di visualizzazione PDF incorporata -->
+    <!-- Finestra di visualizzazione interna (usata solo su PC) -->
     <div id="pdfModal">
         <div class="modal-header">
             <span id="closeBtn" onclick="chiudiPDF()">✖ Chiudi</span>
         </div>
         <div id="modalContent">
-            <!-- Usiamo il visualizzatore ufficiale e gratuito di Mozilla PDF.js -->
             <iframe id="pdfFrame" src=""></iframe>
         </div>
     </div>
@@ -157,7 +156,7 @@
             documenti.forEach(doc => {
                 const li = document.createElement('li');
                 li.className = 'documento-item';
-                li.onclick = () => apriPDF(doc.file);
+                li.onclick = () => gestisciAperturaPDF(doc.file);
                 
                 const a = document.createElement('span');
                 a.className = 'documento-link';
@@ -176,22 +175,22 @@
             mostraDocumenti(documentiFiltrati);
         }
 
-        function apriPDF(fileUrl) {
-            const modal = document.getElementById('pdfModal');
-            const frame = document.getElementById('pdfFrame');
+        // Rileva automaticamente il tipo di dispositivo
+        function gestisciAperturaPDF(fileUrl) {
+            // Controlla se l'utente è su uno smartphone/tablet Android o iOS
+            constisMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // Dati del tuo account GitHub Pages
-            const username = 'cantiparrocchiasanmartino';
-            const repository = 'Canti';
-            
-            // Ricostruiamo il link internet assoluto del tuo file PDF su GitHub
-            const linkCompleto = 'https://' + username + '.github.io/' + repository + '/' + fileUrl;
-            
-            // Sfruttiamo il viewer online di PDF.js per forzare l'apertura visiva su Android e iOS
-            frame.src = 'https://github.io' + encodeURIComponent(linkCompleto);
-            
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
+            if (isMobile) {
+                // SUL TELEFONO: Apre il file in una nuova scheda sfruttando la fluidità del browser mobile
+                window.open(fileUrl, '_blank');
+            } else {
+                // SUL COMPUTER: Mostra il bellissimo box interno con il tasto chiudi
+                const modal = document.getElementById('pdfModal');
+                const frame = document.getElementById('pdfFrame');
+                frame.src = fileUrl;
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         function chiudiPDF() {
