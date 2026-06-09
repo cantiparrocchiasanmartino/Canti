@@ -67,7 +67,7 @@
             font-style: italic;
         }
         
-        /* Stili per il visualizzatore interno (attivo solo su PC) */
+        /* Finestra a schermo intero (Modal) ottimizzata per smartphone */
         #pdfModal {
             display: none;
             position: fixed;
@@ -75,37 +75,42 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.85);
+            background-color: #ffffff; /* Sfondo bianco per eliminare i bordi neri */
             z-index: 1000;
         }
         .modal-header {
             display: flex;
             justify-content: flex-end;
-            padding: 10px 15px;
-            color: white;
+            padding: 8px 12px;
+            background-color: #f1f2f6;
+            border-bottom: 1px solid #e4e7eb;
         }
         #closeBtn {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             background: #e74c3c;
-            padding: 6px 12px;
+            color: white;
+            padding: 6px 16px;
             border-radius: 4px;
+            text-transform: uppercase;
         }
         #modalContent {
             position: absolute;
-            top: 50px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
+            top: 45px; /* Spazio per il tasto chiudi */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            overflow-y: auto; /* Permette di scorrere il canto in verticale se è lungo */
+            -webkit-overflow-scrolling: touch;
         }
-        #pdfFrame {
+        /* L'immagine occupa tutta la larghezza dello schermo dello smartphone */
+        .canto-immagine {
             width: 100%;
-            height: 100%;
-            border: none;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -120,13 +125,14 @@
 
     <ul id="listaDocumenti"></ul>
 
-    <!-- Finestra di visualizzazione interna (usata solo su PC) -->
+    <!-- Finestra di visualizzazione interna (attiva sia su PC che su smartphone) -->
     <div id="pdfModal">
         <div class="modal-header">
             <span id="closeBtn" onclick="chiudiPDF()">✖ Chiudi</span>
         </div>
         <div id="modalContent">
-            <iframe id="pdfFrame" src=""></iframe>
+            <!-- Contenitore dinamico per l'immagine del canto -->
+            <img id="cantoImg" class="canto-immagine" src="" alt="Spartito canto">
         </div>
     </div>
 
@@ -156,7 +162,7 @@
             documenti.forEach(doc => {
                 const li = document.createElement('li');
                 li.className = 'documento-item';
-                li.onclick = function() { gestisciAperturaPDF(doc.file); };
+                li.onclick = function() { apriCanto(doc.file); };
                 
                 const a = document.createElement('span');
                 a.className = 'documento-link';
@@ -175,29 +181,23 @@
             mostraDocumenti(documentiFiltrati);
         }
 
-        // Rileva automaticamente il tipo di dispositivo ed evita errori CORS
-        function gestisciAperturaPDF(fileUrl) {
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        // Mostra l'immagine dentro il nostro contenitore personalizzato
+        function apriCanto(fileUrl) {
+            const modal = document.getElementById('pdfModal');
+            const img = document.getElementById('cantoImg');
             
-            if (isMobile) {
-                // SUL TELEFONO: Apre direttamente il link in una nuova scheda
-                window.open(fileUrl, '_blank');
-            } else {
-                // SUL COMPUTER: Mostra il riquadro interno a comparsa
-                const modal = document.getElementById('pdfModal');
-                const frame = document.getElementById('pdfFrame');
-                frame.src = fileUrl;
-                modal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-            }
+            img.src = fileUrl;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Blocca lo scroll della lista principale
         }
 
         function chiudiPDF() {
             const modal = document.getElementById('pdfModal');
-            const frame = document.getElementById('pdfFrame');
-            frame.src = '';
+            const img = document.getElementById('cantoImg');
+            
+            img.src = '';
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; 
+            document.body.style.overflow = 'auto'; // Ripristina lo scroll
         }
 
         caricaDocumenti();
