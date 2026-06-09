@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivio Documenti PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #searchBar {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #listaDocumenti {
+            list-style: none;
+            padding: 0;
+        }
+        .documento-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .documento-item:hover {
+            transform: translateX(5px);
+        }
+        .documento-link {
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: bold;
+            display: block;
+        }
+        .documento-link:hover {
+            color: #004499;
+        }
+        .nessun-risultato {
+            color: #777;
+            text-align: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>I Miei Documenti PDF</h1>
+    
+    <!-- Barra di ricerca -->
+    <input type="text" id="searchBar" placeholder="Cerca un documento per titolo..." onkeyup="filtraDocumenti()">
+
+    <!-- Lista dei PDF -->
+    <ul id="listaDocumenti"></ul>
+
+    <script>
+        let tuttiIDocumenti = [];
+
+        // Carica i dati dal file JSON
+        async function caricaDocumenti() {
+            try {
+                const response = await fetch('documenti.json');
+                tuttiIDocumenti = await response.json();
+                mostraDocumenti(tuttiIDocumenti);
+            } catch (error) {
+                console.error("Errore nel caricamento del file JSON:", error);
+                document.getElementById('listaDocumenti').innerHTML = "<li>Errore nel caricamento dei documenti.</li>";
+            }
+        }
+
+        // Mostra la lista a schermo
+        function mostraDocumenti(documenti) {
+            const lista = document.getElementById('listaDocumenti');
+            lista.innerHTML = '';
+
+            if (documenti.length === 0) {
+                lista.innerHTML = '<li class="nessun-risultato">Nessun documento trovato.</li>';
+                return;
+            }
+
+            documenti.forEach(doc => {
+                const li = document.createElement('li');
+                li.className = 'documento-item';
+                
+                const a = document.createElement('a');
+                a.href = doc.file;
+                a.className = 'documento-link';
+                a.target = '_blank'; // Apre il PDF in una nuova scheda
+                a.textContent = doc.titolo;
+
+                li.appendChild(a);
+                lista.appendChild(li);
+            });
+        }
+
+        // Filtra i documenti in base alla ricerca
+        function filtraDocumenti() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const documentiFiltrati = tuttiIDocumenti.filter(doc => 
+                doc.titolo.toLowerCase().includes(query)
+            );
+            mostraDocumenti(documentiFiltrati);
+        }
+
+        // Avvia il caricamento all'apertura della pagina
+        caricaDocumenti();
+    </script>
+
+</body>
+</html>
