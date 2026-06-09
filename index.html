@@ -80,8 +80,7 @@
         }
         .modal-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             padding: 10px 15px;
             color: white;
         }
@@ -93,31 +92,20 @@
             padding: 6px 12px;
             border-radius: 4px;
         }
-        #fallbackLink {
-            color: #3498db;
-            text-decoration: underline;
-            font-weight: bold;
-            font-size: 15px;
-        }
         #modalContent {
             position: absolute;
             top: 50px;
             left: 10px;
             right: 10px;
             bottom: 10px;
-            background: white;
+            background: #525659;
             border-radius: 8px;
             overflow: hidden;
         }
-        #pdfObject {
+        #pdfFrame {
             width: 100%;
             height: 100%;
             border: none;
-        }
-        .error-inside-modal {
-            padding: 30px;
-            text-align: center;
-            color: #333;
         }
     </style>
 </head>
@@ -135,18 +123,11 @@
     <!-- Finestra di visualizzazione PDF incorporata -->
     <div id="pdfModal">
         <div class="modal-header">
-            <!-- Pulsante alternativo se il browser mobile non renderizza il PDF internamente -->
-            <a id="fallbackLink" href="#" target="_blank">Apri a schermo intero</a>
             <span id="closeBtn" onclick="chiudiPDF()">✖ Chiudi</span>
         </div>
         <div id="modalContent">
-            <!-- Usiamo object al place di iframe per una migliore compatibilità con i PDF -->
-            <object id="pdfObject" data="" type="application/pdf">
-                <div class="error-inside-modal">
-                    <p>Il tuo dispositivo non supporta l'anteprima dei PDF direttamente nella pagina.</p>
-                    <p><a id="fallbackLinkMobile" href="#" target="_blank" style="color: #0066cc; font-weight: bold; font-size: 18px;">Clicca qui per visualizzare il canto</a></p>
-                </div>
-            </object>
+            <!-- Usiamo il visualizzatore ufficiale e gratuito di Mozilla PDF.js -->
+            <iframe id="pdfFrame" src=""></iframe>
         </div>
     </div>
 
@@ -197,14 +178,17 @@
 
         function apriPDF(fileUrl) {
             const modal = document.getElementById('pdfModal');
-            const pdfObject = document.getElementById('pdfObject');
-            const fallbackLink = document.getElementById('fallbackLink');
-            const fallbackLinkMobile = document.getElementById('fallbackLinkMobile');
+            const frame = document.getElementById('pdfFrame');
             
-            // Imposta l'indirizzo del PDF direttamente dal percorso relativo (senza passare da Google)
-            pdfObject.data = fileUrl;
-            fallbackLink.href = fileUrl;
-            if(fallbackLinkMobile) fallbackLinkMobile.href = fileUrl;
+            // Dati del tuo account GitHub Pages
+            const username = 'cantiparrocchiasanmartino';
+            const repository = 'Canti';
+            
+            // Ricostruiamo il link internet assoluto del tuo file PDF su GitHub
+            const linkCompleto = 'https://' + username + '.github.io/' + repository + '/' + fileUrl;
+            
+            // Sfruttiamo il viewer online di PDF.js per forzare l'apertura visiva su Android e iOS
+            frame.src = 'https://github.io' + encodeURIComponent(linkCompleto);
             
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden'; 
@@ -212,8 +196,8 @@
 
         function chiudiPDF() {
             const modal = document.getElementById('pdfModal');
-            const pdfObject = document.getElementById('pdfObject');
-            pdfObject.data = '';
+            const frame = document.getElementById('pdfFrame');
+            frame.src = '';
             modal.style.display = 'none';
             document.body.style.overflow = 'auto'; 
         }
